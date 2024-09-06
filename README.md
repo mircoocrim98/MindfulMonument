@@ -1,6 +1,6 @@
 # Mindful Monument
 
-![Mindful Monument Image](./MindfulMonument.png)
+<img src="./MindfulMonument.png" alt="Mindful Monument Image" width="300px">
 
 ## Überblick
 
