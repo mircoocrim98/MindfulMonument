@@ -34,6 +34,10 @@
 - Alle, die sich mit einer unterstützenden Community vernetzen wollen.
 
 
+## Kontakt
+
+Wenn du Fragen oder Feedback hast, besuche unsere [Kontaktübersicht](https://wonderl.ink/@mymindfulmonument), um alle unsere Social-Media-Profile und Kontaktmöglichkeiten zu sehen.
+
 ---
 
 Viel Erfolg beim Erreichen deiner Ziele mit **Mindful Monument**!
