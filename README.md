@@ -18,7 +18,7 @@
 
 ## Installation
 
-1. Lade die App aus dem [App Store](#) oder [Google Play Store](#) herunter.
+1. Lade die App aus dem [App Store](#) herunter.
 2. Erstelle ein Konto oder melde dich über Social Media an.
 3. Beginne dein Tagebuch und verbinde dich mit der Community.
 
