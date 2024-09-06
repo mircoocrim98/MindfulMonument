@@ -1,6 +1,5 @@
 # Mindful Monument
 
-![Mindful Monument](./MindfulMonument.png)
 
 ## Überblick
 
