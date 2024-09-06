@@ -1,6 +1,7 @@
 # Mindful Monument
 
 
+
 ## Überblick
 
 **Mindful Monument** ist eine Motivations-App, die dir hilft, deine Ziele zu erreichen und gleichzeitig Dankbarkeit und Achtsamkeit in dein Leben zu integrieren. Die App bietet dir ein digitales Erfolgs- und Dankbarkeitstagebuch sowie eine lebendige Community, die sich gegenseitig unterstützt und motiviert.
