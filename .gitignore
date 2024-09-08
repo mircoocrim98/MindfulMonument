@@ -1,0 +1,68 @@
+# Xcode
+#
+build/
+DerivedData/
+.idea/
+*.xcworkspace
+xcuserdata/
+*.xcodeproj/*.pbxuser
+*.xcodeproj/*.mode1v3
+*.xcodeproj/*.mode2v3
+*.xcodeproj/*.perspectivev3
+*.xcodeproj/project.xcworkspace/xcuserdata
+*.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+
+# Swift Packages
+#
+.swiftpm/
+Package.resolved
+
+# CocoaPods
+#
+Pods/
+Podfile.lock
+
+# Carthage
+#
+Carthage/Build/
+
+# Accio dependency management
+.accio/
+
+# fastlane
+#
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+fastlane/readme.md
+
+# Code Coverage
+#
+*.xccoverage
+*.profdata
+
+# Static Analyzer
+#
+*.dia
+
+# Playgrounds
+#
+timeline.xctimeline
+playground.xcworkspace
+
+# SwiftPM
+#
+.build/
+
+# XCFileLists
+#
+*.xcodeproj/xcshareddata/xcschemes/xcschememanagement.plist
+
+# SPM
+#
+Package.pins
+
+# Bundler
+#
+.bundle/
