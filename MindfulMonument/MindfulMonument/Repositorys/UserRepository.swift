@@ -12,18 +12,116 @@ class UserRepository {
     static let shared = UserRepository()
     private let db = Firestore.firestore()
     
-    func createUserInFirestore(userID: String, email: String, username: String) async throws {
-        let userData: [String: Any] = [
-            "email": email,
-            "username": username,
-            "createdAt": Timestamp(date: Date())
+    func createUserInFirestore(user: UserModel) async throws {
+        try db.collection("users").document(user.id).setData(from: user)
+        
+        let journalRef = db.collection("users").document(user.id).collection("journals")
+        let initialJournalData: [String: Any] = [
+            "affirmation": "",
+            "bestMoment": "",
+            "dailyGoal": "",
+            "gratitude": "",
+            "mood": 3,
+            "relaxation": "",
+            "thoughts": "",
+            "date": Timestamp()
         ]
-        try await db.collection("users").document(userID).setData(userData)
+        try await journalRef.document("\(UUID())").setData(initialJournalData)
     }
     
-    func fetchUserData(userID: String) async throws -> [String: Any]? {
+    func fetchUserData(userID: String) async throws -> UserModel? {
         let document = try await db.collection("users").document(userID).getDocument()
-        return document.data()
+        return try document.data(as: UserModel.self)
+    }
+    
+    func saveJournalEntry(userID: String, journal: JournalEntry) async throws {
+        let journalCollection = db.collection("users").document(userID).collection("journals")
+        
+        guard let journalID = journal.id else {
+            print("Journal hat keine ID. Aktualisierung übersprungen.")
+            return
+        }
+        
+        try journalCollection.document(journalID).setData(from: journal)
+    }
+    
+    func fetchLast7Journals(userID: String) async throws -> [JournalEntry] {
+        let journalCollection = db.collection("users").document(userID).collection("journals")
+        let querySnapshot = try await journalCollection
+            .order(by: "date", descending: false)
+            .limit(to: 7)
+            .getDocuments()
+        
+        return try querySnapshot.documents.compactMap { document in
+            try document.data(as: JournalEntry.self)
+        }
+    }
+    
+    func fetchLatestJournalEntry(userID: String) async throws -> JournalEntry? {
+        let journalCollection = db.collection("users").document(userID).collection("journals")
+        
+        let querySnapshot = try await journalCollection
+            .order(by: "date", descending: true)
+            .limit(to: 1)
+            .getDocuments()
+        
+        guard let document = querySnapshot.documents.first else {
+            return nil
+        }
+        
+        return try document.data(as: JournalEntry.self)
+    }
+    
+    func fetchPreviousJournalEntry(userID: String, before date: Date) async throws -> JournalEntry? {
+            let journalCollection = db.collection("users").document(userID).collection("journals")
+            
+            let querySnapshot = try await journalCollection
+                .whereField("date", isLessThan: Timestamp(date: date))
+                .order(by: "date", descending: true)
+                .limit(to: 1)
+                .getDocuments()
+            
+            guard let document = querySnapshot.documents.first else {
+                return nil
+            }
+            
+            return try document.data(as: JournalEntry.self)
+        }
+        
+        func fetchNextJournalEntry(userID: String, after date: Date) async throws -> JournalEntry? {
+            let journalCollection = db.collection("users").document(userID).collection("journals")
+            
+            let querySnapshot = try await journalCollection
+                .whereField("date", isGreaterThan: Timestamp(date: date))
+                .order(by: "date", descending: false)
+                .limit(to: 1)
+                .getDocuments()
+            
+            guard let document = querySnapshot.documents.first else {
+                return nil
+            }
+            
+            return try document.data(as: JournalEntry.self)
+        }
+
+    
+    func createJournalForToday(userID: String) async throws -> JournalEntry {
+        let journalCollection = db.collection("users").document(userID).collection("journals")
+        
+        let newJournal = JournalEntry(
+            affirmation: "",
+            bestMoment: "",
+            dailyGoal: "",
+            date: Timestamp(),
+            gratitude: "",
+            mood: 3,
+            relaxation: "",
+            thoughts: ""
+        )
+        
+        let documentRef = journalCollection.document()
+        try documentRef.setData(from: newJournal)
+        
+        return newJournal
     }
 }
-

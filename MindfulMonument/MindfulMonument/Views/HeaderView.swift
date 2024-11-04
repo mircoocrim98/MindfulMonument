@@ -8,13 +8,13 @@
 import SwiftUI
 
 struct HeaderView: View {
-    @State private var currentDay = Date()
+    @ObservedObject var userViewModel: UserViewModel
 
     var body: some View {
-        
         HStack {
             Button(action: {
-                currentDay = Calendar.current.date(byAdding: .day, value: -1, to: currentDay) ?? currentDay
+                Task { await userViewModel.navigateToPreviousEntry() }
+                Task { await userViewModel.saveCurrentJournal() }
             }) {
                 Image(systemName: "chevron.left")
                     .foregroundColor(.cyan)
@@ -23,14 +23,16 @@ struct HeaderView: View {
             
             Spacer()
             
-            Text(formattedDate(currentDay))
+            Text(userViewModel.currentJournal != nil ?
+                 formattedDate(userViewModel.currentJournal!.date.dateValue()) : "Error")
                 .font(.system(size: 20, weight: .bold))
                 .foregroundColor(.black)
             
             Spacer()
             
             Button(action: {
-                currentDay = Calendar.current.date(byAdding: .day, value: 1, to: currentDay) ?? currentDay
+                Task { await userViewModel.navigateToNextEntry() }
+                Task { await userViewModel.saveCurrentJournal() }
             }) {
                 Image(systemName: "chevron.right")
                     .foregroundColor(.cyan)
@@ -39,15 +41,14 @@ struct HeaderView: View {
         }
         .padding(.vertical, 10)
         .background(Color(.systemGray6))
+        .onAppear {
+            Task { await userViewModel.loadLatestJournal() }
+        }
     }
-}
-
-func formattedDate(_ date: Date) -> String {
-    let formatter = DateFormatter()
-    formatter.dateFormat = "EEEE, d MMMM yyyy"
-    return formatter.string(from: date)
-}
-
-#Preview {
-    HeaderView()
+    
+    func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, d MMMM yyyy"
+        return formatter.string(from: date)
+    }
 }

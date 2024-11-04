@@ -112,8 +112,9 @@ struct AuthenticationView: View {
         do {
             try await AuthManager.shared.signIn(email: email, password: password)
             errorMessage = nil
+            await viewModel.loadUserData()
         } catch {
-            errorMessage = "Anmeldung fehlgeschlagen: \(error.localizedDescription)"
+            errorMessage = "Anmeldung fehlgeschlagen"
         }
     }
 
@@ -126,8 +127,10 @@ struct AuthenticationView: View {
         do {
             try await AuthManager.shared.signUp(email: email, password: password, username: username)
             errorMessage = nil
+            await viewModel.loadUserData()
         } catch {
-            errorMessage = "Registrierung fehlgeschlagen: \(error.localizedDescription)"
+            errorMessage = "Registrierung fehlgeschlagen"
         }
     }
 }
+

@@ -7,32 +7,30 @@
 
 import SwiftUI
 
-import SwiftUI
-
-struct ChatView: View {
+struct ChatDetailView: View {
     @State private var messageText = ""
     @State private var messages: [String] = ["Hi! Wie geht's?", "Gut, danke! Und dir?"]
     
     var body: some View {
-        VStack {
-            // Navigation Bar
+        VStack(spacing: 0) {
             HStack {
                 Text("Chat mit User")
                     .font(.headline)
-                    .padding()
+                    .foregroundColor(.black)
                 Spacer()
                 Button(action: {
-                    // TODO
+                    // TODO: Aktion für Schließen
                 }) {
                     Image(systemName: "xmark")
                         .foregroundColor(.cyan)
                 }
-                .padding()
             }
-            .background(Color(.systemGray6))
+            .padding()
+            .background(Color.white)
+            .shadow(radius: 2)
             
             ScrollView {
-                VStack(alignment: .leading) {
+                VStack(alignment: .leading, spacing: 8) {
                     ForEach(messages, id: \.self) { message in
                         HStack {
                             if message.starts(with: "Gut") {
@@ -40,29 +38,30 @@ struct ChatView: View {
                                 Text(message)
                                     .padding()
                                     .background(Color.cyan)
-                                    .cornerRadius(15)
                                     .foregroundColor(.white)
+                                    .cornerRadius(10)
                                     .frame(maxWidth: 250, alignment: .trailing)
                             } else {
                                 Text(message)
                                     .padding()
-                                    .background(Color.gray.opacity(0.3))
-                                    .cornerRadius(15)
+                                    .background(Color.gray.opacity(0.2))
+                                    .cornerRadius(10)
                                     .frame(maxWidth: 250, alignment: .leading)
                                 Spacer()
                             }
                         }
-                        .padding(.horizontal)
-                        .padding(.vertical, 4)
                     }
                 }
+                .padding()
             }
+            .background(Color(.systemGray6).ignoresSafeArea())
             
             HStack {
                 TextField("Nachricht eingeben", text: $messageText)
                     .padding()
-                    .background(Color(.systemGray6))
+                    .background(Color.white)
                     .cornerRadius(20)
+                    .shadow(radius: 1)
                 
                 Button(action: {
                     sendMessage()
@@ -73,7 +72,10 @@ struct ChatView: View {
                 }
             }
             .padding()
+            .background(Color.white)
+            .shadow(radius: 2)
         }
+        .background(Color(.systemGray6).ignoresSafeArea())
     }
     
     func sendMessage() {
@@ -84,7 +86,6 @@ struct ChatView: View {
     }
 }
 
-
 #Preview {
-    ChatView()
+    ChatDetailView()
 }

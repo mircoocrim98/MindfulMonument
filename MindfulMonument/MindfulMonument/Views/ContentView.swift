@@ -9,33 +9,33 @@ import SwiftUI
 
 struct ContentView: View {
     
-    //@State var viewModel: UserViewModel
-    
+    @ObservedObject var userViewModel: UserViewModel
+    @ObservedObject var quoteViewModel: QuoteViewModel
+    @ObservedObject var communityViewModel: CommunityViewModel
+
     var body: some View {
         TabView {
-            HomeView()
+            HomeView(userViewModel: userViewModel, quoteViewModel: quoteViewModel)
                 .tabItem {
                     Label("Home", systemImage: "house")
                 }
 
-            JournalView()
+            JournalView(userViewModel: userViewModel)
                 .tabItem {
                     Label("Journal", systemImage: "book")
                 }
 
-//            CommunityView()
+            CommunityView(communityViewModel: communityViewModel, userViewModel: userViewModel)
+                .tabItem {
+                    Label("Community", systemImage: "person.3")
+                }
+
+//            ChatsView()
 //                .tabItem {
-//                    Label("Community", systemImage: "person.3")
-//                }
-//
-//            MessageView()
-//                .tabItem {
-//                    Label("Messages", systemImage: "message")
+//                    Label("Chats", systemImage: "message")
 //                }
         }
+        .accentColor(.cyan)
     }
 }
 
-#Preview {
-    ContentView()
-}
