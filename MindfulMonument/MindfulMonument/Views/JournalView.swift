@@ -69,7 +69,6 @@ struct JournalView: View {
                         set: { userViewModel.currentJournal?.affirmation = $0 ?? ""}
                     ), editable: userViewModel.isCurrentDay)
                     
-                    // Stimmungsanzeige
                     VStack {
                         Text("Wie fühlst du dich heute?")
                             .font(.headline)
@@ -99,7 +98,10 @@ struct JournalView: View {
             Task { await userViewModel.loadLatestJournal()}
         }
         .onDisappear {
-            Task { await userViewModel.saveCurrentJournal() }
+            Task {
+                await userViewModel.saveCurrentJournal()
+                await userViewModel.incrementStreakIfAllSectionsCompleted()
+            }
         }
     }
     

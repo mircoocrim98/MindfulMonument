@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 struct UserModel: Identifiable, Codable {
     let id: String
@@ -14,4 +15,5 @@ struct UserModel: Identifiable, Codable {
     var profileImageURL: String? = nil
     var currentStreak: Int = 0
     var highestStreak: Int = 0
+    var lastStreakDate: Timestamp = Timestamp(date: Calendar.current.date(byAdding: .day, value: -1, to: Date())!)
 }

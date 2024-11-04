@@ -73,37 +73,37 @@ class UserRepository {
     }
     
     func fetchPreviousJournalEntry(userID: String, before date: Date) async throws -> JournalEntry? {
-            let journalCollection = db.collection("users").document(userID).collection("journals")
-            
-            let querySnapshot = try await journalCollection
-                .whereField("date", isLessThan: Timestamp(date: date))
-                .order(by: "date", descending: true)
-                .limit(to: 1)
-                .getDocuments()
-            
-            guard let document = querySnapshot.documents.first else {
-                return nil
-            }
-            
-            return try document.data(as: JournalEntry.self)
+        let journalCollection = db.collection("users").document(userID).collection("journals")
+        
+        let querySnapshot = try await journalCollection
+            .whereField("date", isLessThan: Timestamp(date: date))
+            .order(by: "date", descending: true)
+            .limit(to: 1)
+            .getDocuments()
+        
+        guard let document = querySnapshot.documents.first else {
+            return nil
         }
         
-        func fetchNextJournalEntry(userID: String, after date: Date) async throws -> JournalEntry? {
-            let journalCollection = db.collection("users").document(userID).collection("journals")
-            
-            let querySnapshot = try await journalCollection
-                .whereField("date", isGreaterThan: Timestamp(date: date))
-                .order(by: "date", descending: false)
-                .limit(to: 1)
-                .getDocuments()
-            
-            guard let document = querySnapshot.documents.first else {
-                return nil
-            }
-            
-            return try document.data(as: JournalEntry.self)
+        return try document.data(as: JournalEntry.self)
+    }
+    
+    func fetchNextJournalEntry(userID: String, after date: Date) async throws -> JournalEntry? {
+        let journalCollection = db.collection("users").document(userID).collection("journals")
+        
+        let querySnapshot = try await journalCollection
+            .whereField("date", isGreaterThan: Timestamp(date: date))
+            .order(by: "date", descending: false)
+            .limit(to: 1)
+            .getDocuments()
+        
+        guard let document = querySnapshot.documents.first else {
+            return nil
         }
-
+        
+        return try document.data(as: JournalEntry.self)
+    }
+    
     
     func createJournalForToday(userID: String) async throws -> JournalEntry {
         let journalCollection = db.collection("users").document(userID).collection("journals")
@@ -124,4 +124,46 @@ class UserRepository {
         
         return newJournal
     }
+    
+    
+    
+    func updateStreaksIfNeeded(userID: String) async throws {
+        let userRef = db.collection("users").document(userID)
+        
+        _ = try await db.runTransaction { transaction, errorPointer in
+            do {
+                let userDocument = try transaction.getDocument(userRef)
+                guard var userData = userDocument.data(),
+                      var currentStreak = userData["currentStreak"] as? Int,
+                      var highestStreak = userData["highestStreak"] as? Int,
+                      let lastStreakDateTimestamp = userData["lastStreakDate"] as? Timestamp else {
+                    errorPointer?.pointee = NSError(domain: "AppError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User data not found"])
+                    return nil
+                }
+                
+                let lastStreakDate = lastStreakDateTimestamp.dateValue()
+                if Calendar.current.isDateInToday(lastStreakDate) {
+                    return nil
+                }
+                
+                currentStreak += 1
+
+                if currentStreak > highestStreak {
+                    highestStreak = currentStreak
+                }
+                
+                transaction.updateData([
+                    "currentStreak": currentStreak,
+                    "highestStreak": highestStreak,
+                    "lastStreakDate": Timestamp(date: Date())
+                ], forDocument: userRef)
+                
+                return nil
+            } catch {
+                errorPointer?.pointee = NSError(domain: "AppError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Transaction failed: \(error.localizedDescription)"])
+                return nil
+            }
+        }
+    }
+
 }

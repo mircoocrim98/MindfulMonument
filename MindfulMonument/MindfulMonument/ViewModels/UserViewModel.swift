@@ -114,21 +114,42 @@ class UserViewModel: ObservableObject {
             }
         }
         
-        func navigateToNextEntry() async {
-            guard let currentJournalDate = currentJournal?.date.dateValue(),
-                  let userID = authManager.userID else { return }
-            
-            do {
-                if let nextJournal = try await userRepository.fetchNextJournalEntry(userID: userID, after: currentJournalDate) {
-                    DispatchQueue.main.async {
-                        self.currentJournal = nextJournal
-                        self.isCurrentDay = Calendar.current.isDateInToday(nextJournal.date.dateValue())
-                    }
-                } else {
-                    print("Kein nächster Journal-Eintrag gefunden.")
+    func navigateToNextEntry() async {
+        guard let currentJournalDate = currentJournal?.date.dateValue(),
+              let userID = authManager.userID else { return }
+        
+        do {
+            if let nextJournal = try await userRepository.fetchNextJournalEntry(userID: userID, after: currentJournalDate) {
+                DispatchQueue.main.async {
+                    self.currentJournal = nextJournal
+                    self.isCurrentDay = Calendar.current.isDateInToday(nextJournal.date.dateValue())
                 }
+            } else {
+                print("Kein nächster Journal-Eintrag gefunden.")
+            }
+        } catch {
+            print("Fehler beim Laden des nächsten Journals: \(error)")
+        }
+    }
+    
+    func incrementStreakIfAllSectionsCompleted() async {
+        guard let userID = authManager.userID else { return }
+        let completedSections = [
+            currentJournal?.dailyGoal,
+            currentJournal?.relaxation,
+            currentJournal?.thoughts,
+            currentJournal?.gratitude,
+            currentJournal?.bestMoment,
+            currentJournal?.affirmation
+        ].compactMap { $0 }.filter { !$0.isEmpty }.count
+        
+        if completedSections == 6 {
+            do {
+                try await userRepository.updateStreaksIfNeeded(userID: userID)
+                await loadUserData() 
             } catch {
-                print("Fehler beim Laden des nächsten Journals: \(error)")
+                print("Fehler beim Aktualisieren der Streaks: \(error)")
             }
         }
+    }
 }
